@@ -52,7 +52,7 @@ def main():
     recorder = AudioToTextRecorder(
         model="small.en",
         language="en",
-        post_speech_silence_duration=1.5,
+        post_speech_silence_duration=1.3,
         beam_size=5,
         wake_words=None,
         spinner=True,
