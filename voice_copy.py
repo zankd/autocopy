@@ -5,7 +5,7 @@ import pyautogui
 import re
 
 # Configure logging
-LOG_FILE = os.path.join(os.environ['USERPROFILE'], 'Downloads', 'voice_tt.log')
+LOG_FILE = os.path.join(os.environ['USERPROFILE'], 'Documents', 'voice_tt.log')
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.DEBUG,
