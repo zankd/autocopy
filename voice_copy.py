@@ -1,19 +1,9 @@
-import os
-import logging
 from RealtimeSTT import AudioToTextRecorder
 import pyautogui
 import re
+import logging
 
-# Configure logging
-LOG_FILE = os.path.join(os.environ['USERPROFILE'], 'Documents', 'voice_tt.log')
-logging.basicConfig(
-    filename=LOG_FILE,
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
-
-# Suppress verbose logging from RealtimeSTT
+# Disable verbose logging from the library
 logging.getLogger("RealtimeSTT").setLevel(logging.WARNING)
 
 def main():
@@ -23,59 +13,48 @@ def main():
 
     def process_text(text):
         nonlocal activated
-        logging.info(f"Processing text: {text}")
+        print(f"Processing: {text}")
 
+        # Check if we're already activated
         if activated:
-            try:
-                pyautogui.typewrite(text + " ")
-                logging.info(f"Typed text: {text}")
-                activated = False
-            except Exception as e:
-                logging.error(f"Error typing text: {str(e)}")
+            # Type the text and reset
+            pyautogui.typewrite(text + " ")
+            print(f"✅ Typed: {text}")
+            activated = False
             return
 
+        # Check for wake word in any position
         if wake_word_regex.search(text):
+            # Extract command by removing wake word
             command = wake_word_regex.sub('', text).strip()
             
             if command:
-                try:
-                    pyautogui.typewrite(command + " ")
-                    logging.info(f"Command typed: {command}")
-                except Exception as e:
-                    logging.error(f"Error typing command: {str(e)}")
+                pyautogui.typewrite(command + " ")
+                print(f"✅ Command typed: {command}")
             else:
                 activated = True
-                logging.info("Activation state set to True")
+                print("⚡ Activated! Speak your command...")
 
-    logging.info(f"Starting voice listener with wake word '{WAKE_WORD}'")
+    print(f"🔊 Listening for wake word '{WAKE_WORD}'... (Press Ctrl+C to quit)")
     
     recorder = AudioToTextRecorder(
         model="small.en",
         language="en",
-        post_speech_silence_duration=1.3,
+        post_speech_silence_duration=1.5,
         beam_size=5,
         wake_words=None,
         spinner=True,
-        on_recording_start=lambda: logging.info("Recording started"),
-        on_recording_stop=lambda: logging.info("Recording stopped")
+        on_recording_start=lambda: print("\n⚡ Recording..."),
+        on_recording_stop=lambda: print("🛑 Stopped recording")
     )
 
     try:
         while True:
-            try:
-                recorder.text(process_text)
-            except Exception as e:
-                logging.error(f"Error in recording loop: {str(e)}")
+            recorder.text(process_text)
     except KeyboardInterrupt:
-        logging.info("Shutdown initiated by user")
-    except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}", exc_info=True)
+        print("\n🛑 Shutting down...")
     finally:
-        try:
-            recorder.shutdown()
-            logging.info("Recorder shutdown complete")
-        except Exception as e:
-            logging.error(f"Error shutting down recorder: {str(e)}")
+        recorder.shutdown()
 
 if __name__ == '__main__':
     main()
