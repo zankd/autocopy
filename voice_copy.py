@@ -117,7 +117,7 @@ def main():
 
     try:
         logging.info("Entering main processing loop")
-        print(f"🔊 Listening for wake word '{WAKE_WORD}'... (Press Ctrl+C to quit)")
+        print(f"⚡ Listening for wake word '{WAKE_WORD}'... (Press Ctrl+C to quit)")
         while True:
             recorder.text(process_text)
     except KeyboardInterrupt:
